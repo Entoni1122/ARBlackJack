@@ -43,6 +43,7 @@ public class TraceHandler : MonoBehaviour
             objToMove.transform.position = Vector3.Lerp(objToMove.transform.position,
                                                         targetPos + new Vector3(0,yOffSet,0),
                                                         lerpSpeed * Time.deltaTime);
+
             if (Input.GetMouseButton(1))
             {
                 objToMove.transform.localEulerAngles = Vector3.Lerp(objToMove.transform.localEulerAngles, 
