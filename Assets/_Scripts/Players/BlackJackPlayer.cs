@@ -1,21 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
-using UnityEngine.Playables;
 
+public enum State { Hit, Stand, Think, Bust, Decision }
 public class BlackJackPlayer : BlackJackBaseActors
 {
-    enum State { Hit, Stand, Think, Bust }
-
     Animator animator;
     State currentState;
     [SerializeField] BoxCollider cardCatcher;
     int cardsInHand;
 
+    public static Action OnPlayerReductionCallBack;
+    public static Action OnPLayerTurnEndCallBack;
+    [SerializeField] float timeToDecide;
+    float time;
+
     private void Start()
     {
         animator = GetComponent<Animator>();
         ChangeState(State.Hit);
+        time = timeToDecide;
     }
 
     void HandleState()
@@ -23,19 +26,28 @@ public class BlackJackPlayer : BlackJackBaseActors
         switch (currentState)
         {
             case State.Hit:
+                //pop up they want to hit
                 print("Hit");
                 break;
 
             case State.Stand:
+                OnPlayerReductionCallBack?.Invoke();
+                //pop up they want to stand
                 print("Stand");
                 break;
 
             case State.Think:
-                ShouldActBasedOnCardValue(points);
+                OnPlayerReductionCallBack?.Invoke();
                 print("Thinking");
                 break;
 
+            case State.Decision:
+                ChangeState(ShouldActBasedOnCardValue(points) ? State.Hit : State.Stand);
+                print("Thinking");
+                break;
             case State.Bust:
+                //pop up bust
+                OnPlayerReductionCallBack?.Invoke();
                 print("Bust");
                 break;
 
@@ -43,10 +55,6 @@ public class BlackJackPlayer : BlackJackBaseActors
                 break;
         }
     }
-
-
-    [SerializeField] float bounceForce = 10f;
-    [SerializeField] Vector3 bounceDirection;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -57,18 +65,9 @@ public class BlackJackPlayer : BlackJackBaseActors
             {
                 return;
             }
-            CardManager.instance.AddOutherCards(other.gameObject);
-            CardManager.instance.RemoveInCards(other.gameObject);
             if (currentState != State.Hit)
             {
-                float randomX = Random.Range(5, 30);
-                float randomZ = Random.Range(-45, 45);
-                bounceDirection = new Vector3(randomX, 10f, randomZ);
-                Vector3 force = bounceDirection.normalized * bounceForce;
-
-                rb.AddForce(force, ForceMode.Impulse);
-
-                Debug.DrawRay(other.transform.position, force, Color.red, 2.0f);
+                ThrowCard(rb);
                 return;
             }
 
@@ -87,18 +86,25 @@ public class BlackJackPlayer : BlackJackBaseActors
         }
     }
 
-    void ChangeState(State states)
+    public void ChangeState(State states)
     {
-        currentState = states;
-        HandleState();
+        if (currentState != State.Stand && currentState != State.Bust)
+        {
+            currentState = states;
+            HandleState();
+        }
     }
 
     bool ShouldActBasedOnCardValue(float currentPoint)
     {
         float percentage = ((21.0f - currentPoint) / 21.0f) * 100.0f;
-        percentage = Mathf.Clamp(percentage, .0f, 100.0f);
 
-        int randomCheck = Random.Range(0, 100);
+        int randomCheck = UnityEngine.Random.Range(0, 100);
+        //if its under 20% i dont want the AI to hit regardless of their random decision
+        if (percentage <= 20)
+        {
+            return false;
+        }
 
         return randomCheck <= percentage;
     }

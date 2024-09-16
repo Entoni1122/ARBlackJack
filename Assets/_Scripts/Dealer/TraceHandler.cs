@@ -39,9 +39,9 @@ public class TraceHandler : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
-            Vector3 targetPos = hitData.point;
+            Vector3 targetPos = ray.GetPoint(hitData.distance) + new Vector3(0, yOffSet, 0);
             objToMove.transform.position = Vector3.Lerp(objToMove.transform.position,
-                                                        targetPos + new Vector3(0,yOffSet,0),
+                                                        targetPos,
                                                         lerpSpeed * Time.deltaTime);
 
             if (Input.GetMouseButton(1))
@@ -54,7 +54,6 @@ public class TraceHandler : MonoBehaviour
         else if(Input.GetMouseButtonUp(0))
         {
             objToMove.GetComponent<Rigidbody>().useGravity = true;
-
             objToMove = null;
         }
     }

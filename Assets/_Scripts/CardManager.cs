@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Overlays;
 using UnityEngine;
 
 public class CardManager : MonoBehaviour
@@ -8,8 +9,9 @@ public class CardManager : MonoBehaviour
 
     [SerializeField] List<GameObject> inCards;
     [SerializeField] List<GameObject> outherCards;
+    [SerializeField] float YOffSet;
 
-    
+
     private void OnEnable()
     {
         TraceHandler.OnTakeFirstCardCallBack += SetLayerToCard;
@@ -61,7 +63,7 @@ public class CardManager : MonoBehaviour
         if (inCards.Count <= 1)
         {
             return;
-        
+
         }
 
         if (!inCards.Contains(obj))
@@ -70,11 +72,11 @@ public class CardManager : MonoBehaviour
         }
 
         outherCards.Add(inCards[0]);
-        
+
 
         inCards.RemoveAt(0);
         inCards[0].layer = LayerMask.NameToLayer("Interactable");
-        inCards[0].GetComponent<BoxCollider>().enabled = true; 
+        inCards[0].GetComponent<BoxCollider>().enabled = true;
     }
     public void Shuffle()
     {
@@ -94,15 +96,11 @@ public class CardManager : MonoBehaviour
             inCards[randomIndex].transform.position = tempPosition;
         }
         inCards[0].layer = LayerMask.NameToLayer("Interactable");
-        inCards[0].GetComponent <BoxCollider>().enabled = true;
+        inCards[0].GetComponent<BoxCollider>().enabled = true;
+    }
+    public void GetAllCardTogheter()
+    {
+        print("Organise");
     }
 
-    public void AddOutherCards(GameObject cards)
-    {
-        outherCards.Add(cards);
-    }
-    public void RemoveInCards(GameObject cards)
-    {
-        inCards.Remove(cards);
-    }
 }
