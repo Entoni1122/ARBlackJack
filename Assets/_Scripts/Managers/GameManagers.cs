@@ -12,35 +12,36 @@ public class GameManagers : MonoBehaviour
 
     public static Action OnRestartGameCallBack;
     public static Action OnDealerFreeWillCallBack;
-    int playerDone;
+    
+    int playerDoneCount;
 
     private void OnEnable()
     {
         BlackJackPlayer.OnPlayerReductionCallBack += PlayerReadyCount;
         BlackJackPlayer.OnPLayerTurnEndCallBack += PlayerFinished;
     }
-
     private void OnDisable()
     {
         BlackJackPlayer.OnPlayerReductionCallBack -= PlayerReadyCount;
         BlackJackPlayer.OnPLayerTurnEndCallBack -= PlayerFinished;
-
-
     }
+
+
     private void Start()
     {
         ChangeState(GameState.Dealer);
-        playerDone = playerInTheGame.Count;
+        playerDoneCount = playerInTheGame.Count;
     }
-
+    //Checks when player are fully finished (bust, stand) so that the dealer can play second hand 
     public void PlayerFinished()
     {
-        playerDone--;
-        if (playerDone <= 0)
+        playerDoneCount--;
+        if (playerDoneCount <= 0)
         {
-            OnDealerFreeWillCallBack?.Invoke();
+            ChangeState(GameState.Dealer);
         }
     }
+    
     public void PlayerReadyCount()
     {
         playerReadyCount++;
@@ -64,6 +65,7 @@ public class GameManagers : MonoBehaviour
                 break;
 
             case GameState.Dealer:
+                OnDealerFreeWillCallBack?.Invoke();
                 print("DealersTurn");
                 break;
 
@@ -75,5 +77,6 @@ public class GameManagers : MonoBehaviour
     void ChangeState(GameState state)
     {
         currentState = state;
+        GameStateHandle();
     }
 }

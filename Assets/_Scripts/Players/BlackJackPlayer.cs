@@ -1,24 +1,25 @@
 using System;
 using UnityEngine;
+using UnityEngine.Diagnostics;
 
 public enum State { Hit, Stand, Think, Bust, Decision }
 public class BlackJackPlayer : BlackJackBaseActors
 {
-    Animator animator;
-    State currentState;
+    [Header("Utils")]
+    [SerializeField] Animator animator;
+    [SerializeField] State currentState;
     [SerializeField] BoxCollider cardCatcher;
+    [SerializeField] string stateTXT;
     int cardsInHand;
 
+    
     public static Action OnPlayerReductionCallBack;
     public static Action OnPLayerTurnEndCallBack;
-    [SerializeField] float timeToDecide;
-    float time;
 
     private void Start()
     {
         animator = GetComponent<Animator>();
         ChangeState(State.Hit);
-        time = timeToDecide;
     }
 
     void HandleState()
@@ -27,28 +28,32 @@ public class BlackJackPlayer : BlackJackBaseActors
         {
             case State.Hit:
                 //pop up they want to hit
-                print("Hit");
+                stateTXT = "hit";
                 break;
 
             case State.Stand:
+                stateTXT = "Stand";
                 OnPlayerReductionCallBack?.Invoke();
-                //pop up they want to stand
-                print("Stand");
+                OnPLayerTurnEndCallBack?.Invoke();
                 break;
 
             case State.Think:
                 OnPlayerReductionCallBack?.Invoke();
-                print("Thinking");
+                stateTXT = "think";
+
                 break;
 
             case State.Decision:
                 ChangeState(ShouldActBasedOnCardValue(points) ? State.Hit : State.Stand);
-                print("Thinking");
+                print(points);
+                stateTXT = "decision";
+
                 break;
             case State.Bust:
                 //pop up bust
                 OnPlayerReductionCallBack?.Invoke();
-                print("Bust");
+                OnPLayerTurnEndCallBack?.Invoke();
+                stateTXT = "bust";
                 break;
 
             default:
@@ -100,8 +105,8 @@ public class BlackJackPlayer : BlackJackBaseActors
         float percentage = ((21.0f - currentPoint) / 21.0f) * 100.0f;
 
         int randomCheck = UnityEngine.Random.Range(0, 100);
-        //if its under 20% i dont want the AI to hit regardless of their random decision
-        if (percentage <= 20)
+        //if its under 10% i dont want the AI to hit regardless of their random decision
+        if (percentage <= 10)
         {
             return false;
         }

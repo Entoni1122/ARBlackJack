@@ -3,7 +3,8 @@ using UnityEngine;
 public class BlackJackDealer : BlackJackBaseActors
 {
     bool isDealerTurn;
-    
+    bool isEndRound;
+
     private void OnEnable()
     {
         GameManagers.OnDealerFreeWillCallBack += DealerCanPLay;
@@ -16,7 +17,7 @@ public class BlackJackDealer : BlackJackBaseActors
 
     public void DealerCanPLay()
     {
-        isDealerTurn = true;
+        isEndRound = true;
     }
 
     private void Start()
@@ -28,12 +29,22 @@ public class BlackJackDealer : BlackJackBaseActors
         if (other.gameObject.layer == LayerMask.NameToLayer("Interactable"))
         {
             Rigidbody rb = other.GetComponent<Rigidbody>();
+            if (isEndRound)
+            {
+                points += other.GetComponent<CardValue>().Points;
+                if (points > 21)
+                {
+                    ThrowCard(rb);
+                }
+                //Winner callback
+                return;
+            }
             if (!isDealerTurn)
             {
                 ThrowCard(rb);
                 return;
             }
-            points = other.GetComponent<CardValue>().Points;
+            points += other.GetComponent<CardValue>().Points;
             isDealerTurn = false;
         }
     }
