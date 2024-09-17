@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Diagnostics;
 
@@ -8,12 +9,10 @@ public class BlackJackPlayer : BlackJackBaseActors
     [Header("Utils")]
     [SerializeField] Animator animator;
     [SerializeField] State currentState;
+    public State CurrentState { get { return currentState; } }
     [SerializeField] BoxCollider cardCatcher;
     [SerializeField] string stateTXT;
-    int cardsInHand;
-
-    
-    public static Action OnPlayerReductionCallBack;
+    [SerializeField] PopUpDisplayer popUpDiplayer;
     public static Action OnPLayerTurnEndCallBack;
 
     private void Start()
@@ -28,32 +27,37 @@ public class BlackJackPlayer : BlackJackBaseActors
         {
             case State.Hit:
                 //pop up they want to hit
-                stateTXT = "hit";
+                stateTXT = "HIT";
+                popUpDiplayer.ShowTEXT(stateTXT);
                 break;
 
             case State.Stand:
-                stateTXT = "Stand";
+                stateTXT = "STAND";
+                popUpDiplayer.ShowTEXT(stateTXT);
                 OnPlayerReductionCallBack?.Invoke();
                 OnPLayerTurnEndCallBack?.Invoke();
                 break;
 
             case State.Think:
                 OnPlayerReductionCallBack?.Invoke();
-                stateTXT = "think";
-
                 break;
 
             case State.Decision:
-                ChangeState(ShouldActBasedOnCardValue(points) ? State.Hit : State.Stand);
-                print(points);
-                stateTXT = "decision";
-
+                if (ShouldHit(points))
+                {
+                    ChangeState(State.Hit);
+                }
+                else
+                {
+                    ChangeState(State.Stand);
+                }
                 break;
             case State.Bust:
                 //pop up bust
+                stateTXT = "BUST";
+                popUpDiplayer.ShowTEXT(stateTXT);
                 OnPlayerReductionCallBack?.Invoke();
                 OnPLayerTurnEndCallBack?.Invoke();
-                stateTXT = "bust";
                 break;
 
             default:
@@ -88,6 +92,10 @@ public class BlackJackPlayer : BlackJackBaseActors
             {
                 ChangeState(State.Think);
             }
+            else if (points < 21 && cardsInHand > 2)
+            {
+                ChangeState(State.Decision);
+            }
         }
     }
 
@@ -100,16 +108,21 @@ public class BlackJackPlayer : BlackJackBaseActors
         }
     }
 
-    bool ShouldActBasedOnCardValue(float currentPoint)
+    bool ShouldHit(float currentPoint)
     {
-        float percentage = ((21.0f - currentPoint) / 21.0f) * 100.0f;
-
-        int randomCheck = UnityEngine.Random.Range(0, 100);
-        //if its under 10% i dont want the AI to hit regardless of their random decision
-        if (percentage <= 10)
+        //Just to have less probability that everyonw stand first turn (boring)
+        if (points < 13)
+        {
+            return true;
+        }
+        else if (points > 19) //Just to not make the AI too dumb
         {
             return false;
+
         }
+        float percentage = ((21.0f - currentPoint) / 21.0f) * 100.0f;
+        int randomCheck = UnityEngine.Random.Range(0, 100);
+
 
         return randomCheck <= percentage;
     }

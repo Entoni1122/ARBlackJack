@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 
 public class BlackJackDealer : BlackJackBaseActors
 {
     bool isDealerTurn;
-    bool isEndRound;
+    bool isEndRound = false;
+
+    public static Action<int> OnCalculatePoints;
 
     private void OnEnable()
     {
@@ -32,11 +35,7 @@ public class BlackJackDealer : BlackJackBaseActors
             if (isEndRound)
             {
                 points += other.GetComponent<CardValue>().Points;
-                if (points > 21)
-                {
-                    ThrowCard(rb);
-                }
-                //Winner callback
+                OnCalculatePoints?.Invoke(points);
                 return;
             }
             if (!isDealerTurn)
@@ -45,7 +44,13 @@ public class BlackJackDealer : BlackJackBaseActors
                 return;
             }
             points += other.GetComponent<CardValue>().Points;
-            isDealerTurn = false;
+            cardsInHand++;
+            if (cardsInHand == 2)
+            {
+                print(cardsInHand);
+                OnPlayerReductionCallBack?.Invoke();
+                isDealerTurn = false;
+            }
         }
     }
 }
