@@ -53,7 +53,6 @@ public class BlackJackPlayer : BlackJackBaseActors
                 }
                 break;
             case State.Bust:
-                //pop up bust
                 stateTXT = "BUST";
                 popUpDiplayer.ShowTEXT(stateTXT);
                 OnPlayerReductionCallBack?.Invoke();

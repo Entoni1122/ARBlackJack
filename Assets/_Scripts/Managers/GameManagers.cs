@@ -81,6 +81,7 @@ public class GameManagers : MonoBehaviour
             {
                 player.GetComponentInChildren<BlackJackPlayer>().ChangeState(State.Decision);
             }
+            playerReadyCount = 0;
         }
     }
     public void GameStateHandle()
@@ -124,14 +125,21 @@ public class GameManagers : MonoBehaviour
             }
             return;
         }
-        if (points == maxTableValue)
-        {
-            ShowWinnerTEXT("TIE");
-        }
         if (points > maxTableValue)
         {
             ShowWinnerTEXT("Dealer Won");
+            for (int i = 0; i < winners.Count; i++)
+            {
+                BlackJackPlayer playerComponent = winners[i].GetComponentInChildren<BlackJackPlayer>();
+                int playerPoints = playerComponent.Points;
+                print(playerPoints);
+                playerComponent.ChangeState(State.Bust);
+            }
             return;
+        }
+        if (points == maxTableValue)
+        {
+            ShowWinnerTEXT("TIE");
         }
         //Checks the remaining player to bust who is under the dealer
         for (int i = 0; i < winners.Count; i++)
