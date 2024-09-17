@@ -1933,7 +1933,7 @@ PrefabInstance:
     - target: {fileID: 5620023247811269349, guid: 1527a0cbd402ee2429fd6695e19c6786,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.232
+      value: 1.2344
       objectReference: {fileID: 0}
     - target: {fileID: 5620023247811269349, guid: 1527a0cbd402ee2429fd6695e19c6786,
         type: 3}
@@ -3422,7 +3422,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inCards: []
   outherCards: []
-  YOffSet: 0
+  YOffSet: 0.0014
 --- !u!4 &493416276 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5620023247811269349, guid: 1527a0cbd402ee2429fd6695e19c6786,
@@ -5143,18 +5143,6 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 493416275}
         m_TargetAssemblyTypeName: CardManager, Assembly-CSharp
-        m_MethodName: Shuffle
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 493416275}
-        m_TargetAssemblyTypeName: CardManager, Assembly-CSharp
         m_MethodName: GetAllCardTogheter
         m_Mode: 1
         m_Arguments:
@@ -6369,6 +6357,7 @@ MonoBehaviour:
   - {fileID: 147153002}
   - {fileID: 1384676512}
   - {fileID: 594793388}
+  delearRef: {fileID: 1088790302}
   winners: []
   playerTracked: []
   winnerTextContainer: {fileID: 1202141129}

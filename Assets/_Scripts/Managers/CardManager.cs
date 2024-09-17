@@ -20,16 +20,13 @@ public class CardManager : MonoBehaviour
     {
         TraceHandler.OnTakeFirstCardCallBack -= SetLayerToCard;
         ButtonAnimation.OnShuffleButtonPressed -= Shuffle;
-
     }
-
     private void Start()
     {
         for (int i = 0; i < transform.childCount; i++)
         {
             inCards.Add(transform.GetChild(i).gameObject);
         }
-
         Shuffle();
     }
     private void Update()
@@ -41,9 +38,9 @@ public class CardManager : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    //Method used with [ExecuteInEditMode] to assign the value to my card without doing it by hand
     public void GenerateValueInDeck()
     {
+        //Method used with [ExecuteInEditMode] to assign the value to my card without doing it by hand
         for (int i = 0; i < transform.childCount; i++)
         {
             int value = i % 13;
@@ -59,7 +56,6 @@ public class CardManager : MonoBehaviour
         }
     }
 #endif
-
     public void SetLayerToCard(GameObject obj)
     {
         if (inCards.Count <= 1)
@@ -102,7 +98,21 @@ public class CardManager : MonoBehaviour
     }
     public void GetAllCardTogheter()
     {
-        print("Organise");
+        if (outherCards.Count > 0)
+        {
+            for (int i = 0; i < inCards.Count; i++)
+            {
+                inCards[i].transform.position += new Vector3(0, outherCards.Count * YOffSet, 0);
+            }
+            for (int i = 0; i < outherCards.Count; i++)
+            {
+                outherCards[i].GetComponent<BoxCollider>().enabled = false;
+                outherCards[i].GetComponent<Rigidbody>().isKinematic = true;
+                outherCards[i].transform.position = transform.position - new Vector3(0, inCards.Count * YOffSet, 0);
+                outherCards[i].transform.rotation = transform.rotation;
+                inCards.Add(outherCards[i]);
+            }
+            outherCards.Clear();
+        }
     }
-
 }

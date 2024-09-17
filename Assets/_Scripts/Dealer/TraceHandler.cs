@@ -26,7 +26,9 @@ public class TraceHandler : MonoBehaviour
                 && Input.GetMouseButtonDown(0))
             {
                 objToMove = hitData.collider.gameObject;
+                objToMove.GetComponent<Rigidbody>().isKinematic = false;
                 objToMove.GetComponent<Rigidbody>().useGravity = false;
+
 
                 OnTakeFirstCardCallBack?.Invoke(objToMove);
             }

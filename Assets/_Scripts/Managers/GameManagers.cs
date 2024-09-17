@@ -9,6 +9,7 @@ public class GameManagers : MonoBehaviour
     GameState currentState;
 
     [SerializeField] List<GameObject> playerInTheGame;
+    [SerializeField] GameObject delearRef;
     int playerReadyCount;
 
     public static Action OnRestartGameCallBack;
@@ -34,16 +35,17 @@ public class GameManagers : MonoBehaviour
         BlackJackPlayer.OnPLayerTurnEndCallBack -= PlayerFinished;
         BlackJackDealer.OnCalculatePoints -= CalculateWinner;
     }
-
     public void OnPlayerEnd()
     {
+        int dlearpoint = delearRef.GetComponent<BlackJackDealer>().Points;
         //Checks who are the player still in game removing who is busted
         for (int i = playerInTheGame.Count - 1; i >= 0; i--)
         {
             BlackJackPlayer playerComponent = playerInTheGame[i].GetComponentInChildren<BlackJackPlayer>();
             int playerPoints = playerComponent.Points;
 
-            if (playerInTheGame[i].GetComponentInChildren<BlackJackPlayer>().CurrentState == State.Stand)
+            if (playerInTheGame[i].GetComponentInChildren<BlackJackPlayer>().CurrentState == State.Stand &&
+                playerPoints > dlearpoint)
             {
                 playerTracked.Add(playerInTheGame[i]);
                 if (maxTableValue < playerPoints)
@@ -52,9 +54,8 @@ public class GameManagers : MonoBehaviour
                 }
             }
         }
-        winners = playerTracked;
+        winners = new List<GameObject>(playerTracked);
     }
-
     private void Start()
     {
         winnerText = winnerTextContainer.GetComponentInChildren<TextMeshProUGUI>();
@@ -69,7 +70,6 @@ public class GameManagers : MonoBehaviour
             ChangeState(GameState.Dealer);
         }
     }
-
     public void PlayerReadyCount()
     {
         playerReadyCount++;
@@ -83,7 +83,6 @@ public class GameManagers : MonoBehaviour
             }
         }
     }
-
     public void GameStateHandle()
     {
         switch (currentState)
@@ -98,46 +97,40 @@ public class GameManagers : MonoBehaviour
                 break;
         }
     }
-
     public void ShowWinnerTEXT(string winner)
     {
+        winnerTextContainer.gameObject.SetActive(true);
         winnerText.text += " " + winner;
     }
     public void CalculateWinner(int points)
     {
-        print("Caluclate winners");
+        print(points);
         //If the dealer got more then 21 calculate the winner form the player that are in stand
         //Otherwise calculate each time the dealer picks a card, who need to go out
         if (points > 21)
         {
-            if (playerTracked.Count > 0)
+            if (winners.Count > 0)
             {
                 winnerText.text += "Winners ";
-                for (int i = 0; i < playerTracked.Count; i++)
+                for (int i = 0; i < winners.Count; i++)
                 {
                     //Put winner at the start of the sentence
-                    ShowWinnerTEXT(playerTracked[i].GetComponentInChildren<BlackJackPlayer>().Names);
+                    ShowWinnerTEXT(winners[i].GetComponentInChildren<BlackJackPlayer>().Names);
                 }
             }
             else
             {
                 ShowWinnerTEXT("Dealer Busted");
             }
-            winnerTextContainer.gameObject.SetActive(true);
             return;
         }
         if (points == maxTableValue)
         {
-            winnerTextContainer.gameObject.SetActive(true);
             ShowWinnerTEXT("TIE");
         }
         if (points > maxTableValue)
         {
-            if (playerTracked.Count > 0)
-            {
-                winnerTextContainer.gameObject.SetActive(true);
-                ShowWinnerTEXT("Dealer Won");
-            }
+            ShowWinnerTEXT("Dealer Won");
             return;
         }
         //Checks the remaining player to bust who is under the dealer
@@ -145,8 +138,8 @@ public class GameManagers : MonoBehaviour
         {
             BlackJackPlayer playerComponent = winners[i].GetComponentInChildren<BlackJackPlayer>();
             int playerPoints = playerComponent.Points;
-
-            if (playerPoints < points || maxTableValue > playerPoints)
+            print(playerPoints);
+            if (playerPoints < points)
             {
                 playerComponent.ChangeState(State.Bust);
 
@@ -155,13 +148,11 @@ public class GameManagers : MonoBehaviour
                 //Check if the last player was removed so that the dealer wins without doing another time the method
                 if (winners.Count <= 0)
                 {
-                    winnerTextContainer.gameObject.SetActive(true);
                     ShowWinnerTEXT("Dealer Won");
                 }
             }
         }
     }
-
     void ChangeState(GameState state)
     {
         currentState = state;
