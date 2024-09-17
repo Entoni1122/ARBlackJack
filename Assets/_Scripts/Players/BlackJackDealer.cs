@@ -1,10 +1,14 @@
 using System;
+using TMPro;
 using UnityEngine;
 
 public class BlackJackDealer : BlackJackBaseActors
 {
     bool isDealerTurn;
     bool isEndRound = false;
+
+    [SerializeField] TextMeshProUGUI dealerNameTXT;
+    [SerializeField] TextMeshProUGUI dealerScoreTXT;
 
     public static Action<int> OnCalculatePoints;
 
@@ -25,6 +29,7 @@ public class BlackJackDealer : BlackJackBaseActors
 
     private void Start()
     {
+        dealerNameTXT.text = Names;
         isDealerTurn = true;
     }
     private void OnTriggerEnter(Collider other)
@@ -35,6 +40,7 @@ public class BlackJackDealer : BlackJackBaseActors
             if (isEndRound)
             {
                 points += other.GetComponent<CardValue>().Points;
+                dealerScoreTXT.text = points.ToString();
                 OnCalculatePoints?.Invoke(points);
                 return;
             }
@@ -45,6 +51,7 @@ public class BlackJackDealer : BlackJackBaseActors
             }
             points += other.GetComponent<CardValue>().Points;
             cardsInHand++;
+            dealerScoreTXT.text = points.ToString();
             if (cardsInHand == 2)
             {
                 print(cardsInHand);

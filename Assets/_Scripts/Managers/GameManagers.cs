@@ -110,12 +110,12 @@ public class GameManagers : MonoBehaviour
         //Otherwise calculate each time the dealer picks a card, who need to go out
         if (points > 21)
         {
-            if (playerTracked.Count > 0 && playerTracked.Count < 4)
+            if (playerTracked.Count > 0)
             {
+                winnerText.text += "Winners ";
                 for (int i = 0; i < playerTracked.Count; i++)
                 {
                     //Put winner at the start of the sentence
-                    winnerText.text += "Winners : ";
                     ShowWinnerTEXT(playerTracked[i].GetComponentInChildren<BlackJackPlayer>().Names);
                 }
             }
@@ -135,10 +135,6 @@ public class GameManagers : MonoBehaviour
         {
             if (playerTracked.Count > 0)
             {
-                //for (int i = 0; i < playerTracked.Count; i++)
-                //{
-                //    print(playerTracked[i].GetComponentInChildren<BlackJackPlayer>().Names + " Lost");
-                //}
                 winnerTextContainer.gameObject.SetActive(true);
                 ShowWinnerTEXT("Dealer Won");
             }
