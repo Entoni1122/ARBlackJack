@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 
 public class TraceHandler : MonoBehaviour
@@ -12,11 +13,14 @@ public class TraceHandler : MonoBehaviour
     [SerializeField] float rotSpeed;
     [SerializeField] float yOffSet;
 
+    [Header("PlayerStatTXT")]
+    [SerializeField] GameObject playerStat;
+    [SerializeField] TextMeshProUGUI playerNameTXT;
+    [SerializeField] TextMeshProUGUI scoreTXT;
     GameObject objToMove;
+    bool shouldTrace = true;
 
     public static Action<GameObject> OnTakeFirstCardCallBack;
-
-    bool shouldTrace = true;
 
     private void Update()
     {
@@ -33,8 +37,16 @@ public class TraceHandler : MonoBehaviour
 
         if (Physics.Raycast(ray, out hitData, traceLenght))
         {
-            if (hitData.collider.gameObject.layer == LayerMask.NameToLayer("Interactable")
-                && Input.GetMouseButtonDown(0))
+            if (hitData.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+            {
+                print("Overlappong with a player");
+                playerStat.SetActive(true);
+                playerNameTXT.text = hitData.collider.GetComponentInChildren<BlackJackPlayer>().Names;
+                scoreTXT.text = hitData.collider.GetComponentInChildren<BlackJackPlayer>().Points.ToString();
+                
+            }
+            else if (hitData.collider.gameObject.layer == LayerMask.NameToLayer("Interactable")
+                                                          && Input.GetMouseButtonDown(0))
             {
                 objToMove = hitData.collider.gameObject;
                 objToMove.GetComponent<Rigidbody>().isKinematic = false;
@@ -42,6 +54,14 @@ public class TraceHandler : MonoBehaviour
 
                 OnTakeFirstCardCallBack?.Invoke(objToMove);
             }
+            else
+            {
+                playerStat.SetActive(false);
+            }
+        }
+        else
+        {
+            playerStat.SetActive(false);
         }
 
         if (!objToMove)

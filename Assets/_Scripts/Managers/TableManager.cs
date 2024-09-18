@@ -110,7 +110,7 @@ public class TableManager : MonoBehaviour
                 {
                     //Put winner at the start of the sentence
                     ShowWinnerTEXT(winners[i].GetComponentInChildren<BlackJackPlayer>().Names);
-                    winners[i].GetComponentInChildren<BlackJackPlayer>().ChangeState(State.Win);
+                    winners[i].GetComponentInChildren<BlackJackPlayer>().ForceState(State.Win);
                 }
             }
             else
@@ -127,14 +127,17 @@ public class TableManager : MonoBehaviour
             ShowWinnerTEXT("Dealer Won");
             for (int i = 0; i < winners.Count; i++)
             {
-                BlackJackPlayer playerComponent = winners[i].GetComponentInChildren<BlackJackPlayer>();
-                playerComponent.ChangeState(State.Bust);
+                winners[i].GetComponentInChildren<BlackJackPlayer>().ForceState(State.Bust);
             }
             return;
         }
         if (points == maxTableValue)
         {
             ShowWinnerTEXT("TIE");
+            for (int i = 0; i < winners.Count; i++)
+            {
+                winners[i].GetComponentInChildren<BlackJackPlayer>().ForceState(State.Tie);
+            }
         }
         //Checks the remaining player to bust who is under the dealer
         for (int i = 0; i < winners.Count; i++)
@@ -143,7 +146,7 @@ public class TableManager : MonoBehaviour
             int playerPoints = playerComponent.Points;
             if (playerPoints < points)
             {
-                playerComponent.ChangeState(State.Bust);
+                playerComponent.ForceState(State.Bust);
                 winners.Remove(winners[i].gameObject);
                 //Check if the last player was removed so that the dealer wins without doing another time the method
                 if (winners.Count <= 0)

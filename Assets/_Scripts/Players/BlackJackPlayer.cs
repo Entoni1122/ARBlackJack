@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public enum State { Hit, Stand, Bust, Win, Think, Decision }
+public enum State { Hit, Stand, Bust, Win, Tie, Think, Decision }
 public class BlackJackPlayer : BlackJackBaseActors
 {
     public State CurrentState { get { return currentState; } }
@@ -25,6 +25,7 @@ public class BlackJackPlayer : BlackJackBaseActors
         currentState = State.Hit;
         ChangeState(State.Hit);
     }
+
     void HandleState()
     {
         //Each time you change state the animator sees the enum State and uses the correct number to switch
@@ -65,6 +66,13 @@ public class BlackJackPlayer : BlackJackBaseActors
             default:
                 break;
         }
+    }
+
+    public void ForceState(State state)
+    {
+        //May the power be with you
+        animator.SetTrigger("ChangeState");
+        animator.SetInteger("State", (int)state);
     }
     public void ChangeState(State states)
     {
