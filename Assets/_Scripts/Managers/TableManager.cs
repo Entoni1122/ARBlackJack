@@ -110,6 +110,7 @@ public class TableManager : MonoBehaviour
                 {
                     //Put winner at the start of the sentence
                     ShowWinnerTEXT(winners[i].GetComponentInChildren<BlackJackPlayer>().Names);
+                    winners[i].GetComponentInChildren<BlackJackPlayer>().ChangeState(State.Win);
                 }
             }
             else
