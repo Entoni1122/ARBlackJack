@@ -1,26 +1,30 @@
 using System;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Diagnostics;
 
 public enum State { Hit, Stand, Think, Bust, Decision }
 public class BlackJackPlayer : BlackJackBaseActors
 {
-    [Header("Utils")]
-    [SerializeField] Animator animator;
-    [SerializeField] State currentState;
     public State CurrentState { get { return currentState; } }
-    [SerializeField] BoxCollider cardCatcher;
+
+    [Header("Utils")]
+    [SerializeField] State currentState;
+    [SerializeField] Animator animator;
     [SerializeField] string stateTXT;
     [SerializeField] PopUpDisplayer popUpDiplayer;
-    public static Action OnPLayerTurnEndCallBack;
+
+    public static Action OnPlayerTurnEndCallBack;
 
     private void Start()
     {
         animator = GetComponent<Animator>();
         ChangeState(State.Hit);
     }
-
+    public override void RestartGame()
+    {
+        base.RestartGame();
+        currentState = State.Hit;
+        ChangeState(State.Hit);
+    }
     void HandleState()
     {
         switch (currentState)
@@ -30,18 +34,15 @@ public class BlackJackPlayer : BlackJackBaseActors
                 stateTXT = "HIT";
                 popUpDiplayer.ShowTEXT(stateTXT);
                 break;
-
             case State.Stand:
                 stateTXT = "STAND";
                 popUpDiplayer.ShowTEXT(stateTXT);
                 OnPlayerReductionCallBack?.Invoke();
-                OnPLayerTurnEndCallBack?.Invoke();
+                OnPlayerTurnEndCallBack?.Invoke();
                 break;
-
             case State.Think:
                 OnPlayerReductionCallBack?.Invoke();
                 break;
-
             case State.Decision:
                 if (ShouldHit(points))
                 {
@@ -56,14 +57,37 @@ public class BlackJackPlayer : BlackJackBaseActors
                 stateTXT = "BUST";
                 popUpDiplayer.ShowTEXT(stateTXT);
                 OnPlayerReductionCallBack?.Invoke();
-                OnPLayerTurnEndCallBack?.Invoke();
+                OnPlayerTurnEndCallBack?.Invoke();
                 break;
-
             default:
                 break;
         }
     }
+    public void ChangeState(State states)
+    {
+        if (currentState != State.Stand && currentState != State.Bust)
+        {
+            currentState = states;
+            HandleState();
+        }
+    }
+    bool ShouldHit(float currentPoint)
+    {
+        //Just to have less probability that everyonw stand first turn (boring)
+        if (points < 13)
+        {
+            return true;
+        }
+        else if (points > 19) //Just to not make the AI too dumb
+        {
+            return false;
 
+        }
+        float percentage = ((21.0f - currentPoint) / 21.0f) * 100.0f;
+        int randomCheck = UnityEngine.Random.Range(0, 100);
+
+        return randomCheck <= percentage;
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Interactable"))
@@ -96,33 +120,5 @@ public class BlackJackPlayer : BlackJackBaseActors
                 ChangeState(State.Decision);
             }
         }
-    }
-
-    public void ChangeState(State states)
-    {
-        if (currentState != State.Stand && currentState != State.Bust)
-        {
-            currentState = states;
-            HandleState();
-        }
-    }
-
-    bool ShouldHit(float currentPoint)
-    {
-        //Just to have less probability that everyonw stand first turn (boring)
-        if (points < 13)
-        {
-            return true;
-        }
-        else if (points > 19) //Just to not make the AI too dumb
-        {
-            return false;
-
-        }
-        float percentage = ((21.0f - currentPoint) / 21.0f) * 100.0f;
-        int randomCheck = UnityEngine.Random.Range(0, 100);
-
-
-        return randomCheck <= percentage;
     }
 }

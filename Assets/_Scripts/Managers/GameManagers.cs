@@ -1,88 +1,37 @@
 using System;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
+public enum GameState { Players, Dealer }
 public class GameManagers : MonoBehaviour
 {
-    enum GameState { Players, Dealer }
     GameState currentState;
+    public GameState CurrentState { get { return currentState; } }
+    public static GameManagers instance;
 
-    [SerializeField] List<GameObject> playerInTheGame;
-    [SerializeField] GameObject delearRef;
-    int playerReadyCount;
-
-    public static Action OnRestartGameCallBack;
     public static Action OnDealerFreeWillCallBack;
-
-    [SerializeField] List<GameObject> winners;
-    [SerializeField] List<GameObject> playerTracked;
-    [SerializeField] GameObject winnerTextContainer;
-    TextMeshProUGUI winnerText;
-    int maxTableValue = 0;
-
-    int playerDoneCount;
-
+    
+    private void Awake()
+    {
+        if (!instance)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(this);
+        }
+    }
     private void OnEnable()
     {
-        BlackJackPlayer.OnPlayerReductionCallBack += PlayerReadyCount;
-        BlackJackPlayer.OnPLayerTurnEndCallBack += PlayerFinished;
-        BlackJackDealer.OnCalculatePoints += CalculateWinner;
+        UiManager.OnButtonRestartClickedCallBack += RestartGame;
     }
     private void OnDisable()
     {
-        BlackJackPlayer.OnPlayerReductionCallBack -= PlayerReadyCount;
-        BlackJackPlayer.OnPLayerTurnEndCallBack -= PlayerFinished;
-        BlackJackDealer.OnCalculatePoints -= CalculateWinner;
+        UiManager.OnButtonRestartClickedCallBack -= RestartGame;
     }
-    public void OnPlayerEnd()
+    public void RestartGame()
     {
-        int dlearpoint = delearRef.GetComponent<BlackJackDealer>().Points;
-        //Checks who are the player still in game removing who is busted
-        for (int i = playerInTheGame.Count - 1; i >= 0; i--)
-        {
-            BlackJackPlayer playerComponent = playerInTheGame[i].GetComponentInChildren<BlackJackPlayer>();
-            int playerPoints = playerComponent.Points;
-
-            if (playerInTheGame[i].GetComponentInChildren<BlackJackPlayer>().CurrentState == State.Stand &&
-                playerPoints > dlearpoint)
-            {
-                playerTracked.Add(playerInTheGame[i]);
-                if (maxTableValue < playerPoints)
-                {
-                    maxTableValue = playerPoints;
-                }
-            }
-        }
-        winners = new List<GameObject>(playerTracked);
-    }
-    private void Start()
-    {
-        winnerText = winnerTextContainer.GetComponentInChildren<TextMeshProUGUI>();
-        playerDoneCount = playerInTheGame.Count;
-    }
-    public void PlayerFinished()
-    {
-        //Checks when player are fully finished (bust, stand) so that the dealer can play second hand 
-        playerDoneCount--;
-        if (playerDoneCount <= 0)
-        {
-            ChangeState(GameState.Dealer);
-        }
-    }
-    public void PlayerReadyCount()
-    {
-        playerReadyCount++;
-        print(playerReadyCount);
-
-        if (playerReadyCount >= playerInTheGame.Count + 1)
-        {
-            foreach (GameObject player in playerInTheGame)
-            {
-                player.GetComponentInChildren<BlackJackPlayer>().ChangeState(State.Decision);
-            }
-            playerReadyCount = 0;
-        }
+        //When the restart is pressed do what u want
     }
     public void GameStateHandle()
     {
@@ -91,77 +40,13 @@ public class GameManagers : MonoBehaviour
             case GameState.Players:
                 break;
             case GameState.Dealer:
-                OnPlayerEnd();
                 OnDealerFreeWillCallBack?.Invoke();
                 break;
             default:
                 break;
         }
     }
-    public void ShowWinnerTEXT(string winner)
-    {
-        winnerTextContainer.gameObject.SetActive(true);
-        winnerText.text += " " + winner;
-    }
-    public void CalculateWinner(int points)
-    {
-        print(points);
-        //If the dealer got more then 21 calculate the winner form the player that are in stand
-        //Otherwise calculate each time the dealer picks a card, who need to go out
-        if (points > 21)
-        {
-            if (winners.Count > 0)
-            {
-                winnerText.text += "Winners ";
-                for (int i = 0; i < winners.Count; i++)
-                {
-                    //Put winner at the start of the sentence
-                    ShowWinnerTEXT(winners[i].GetComponentInChildren<BlackJackPlayer>().Names);
-                }
-            }
-            else
-            {
-                ShowWinnerTEXT("Dealer Busted");
-            }
-            return;
-        }
-        if (points > maxTableValue)
-        {
-            ShowWinnerTEXT("Dealer Won");
-            for (int i = 0; i < winners.Count; i++)
-            {
-                BlackJackPlayer playerComponent = winners[i].GetComponentInChildren<BlackJackPlayer>();
-                int playerPoints = playerComponent.Points;
-                print(playerPoints);
-                playerComponent.ChangeState(State.Bust);
-            }
-            return;
-        }
-        if (points == maxTableValue)
-        {
-            ShowWinnerTEXT("TIE");
-        }
-        //Checks the remaining player to bust who is under the dealer
-        for (int i = 0; i < winners.Count; i++)
-        {
-            BlackJackPlayer playerComponent = winners[i].GetComponentInChildren<BlackJackPlayer>();
-            int playerPoints = playerComponent.Points;
-            print(playerPoints);
-            if (playerPoints < points)
-            {
-                playerComponent.ChangeState(State.Bust);
-
-                winners.Remove(winners[i].gameObject);
-
-                //Check if the last player was removed so that the dealer wins without doing another time the method
-                if (winners.Count <= 0)
-                {
-                    ShowWinnerTEXT("Dealer Won");
-                }
-            }
-        }
-    }
-    void ChangeState(GameState state)
+    public void ChangeState(GameState state)
     {
         currentState = state;
         GameStateHandle();

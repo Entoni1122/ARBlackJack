@@ -3,9 +3,12 @@ using UnityEngine;
 
 public class TraceHandler : MonoBehaviour
 {
+    [Header("RayVARS")]
     [SerializeField] float traceLenght;
     [SerializeField] LayerMask layerToSlide;
     [SerializeField] float lerpSpeed;
+
+    [Header("CardPosAndRot")]
     [SerializeField] float rotSpeed;
     [SerializeField] float yOffSet;
 
@@ -13,12 +16,20 @@ public class TraceHandler : MonoBehaviour
 
     public static Action<GameObject> OnTakeFirstCardCallBack;
 
+    bool shouldTrace = true;
 
     private void Update()
     {
+        if (!shouldTrace)
+        {
+            return;
+        }
+        DealerRaycastCheck();
+    }
+    void DealerRaycastCheck()
+    {
         RaycastHit hitData;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
 
         if (Physics.Raycast(ray, out hitData, traceLenght))
         {
@@ -28,7 +39,6 @@ public class TraceHandler : MonoBehaviour
                 objToMove = hitData.collider.gameObject;
                 objToMove.GetComponent<Rigidbody>().isKinematic = false;
                 objToMove.GetComponent<Rigidbody>().useGravity = false;
-
 
                 OnTakeFirstCardCallBack?.Invoke(objToMove);
             }
@@ -48,12 +58,12 @@ public class TraceHandler : MonoBehaviour
 
             if (Input.GetMouseButton(1))
             {
-                objToMove.transform.localEulerAngles = Vector3.Lerp(objToMove.transform.localEulerAngles, 
+                objToMove.transform.localEulerAngles = Vector3.Lerp(objToMove.transform.localEulerAngles,
                                                                objToMove.transform.localEulerAngles + Vector3.up,
                                                                rotSpeed * Time.deltaTime);
             }
         }
-        else if(Input.GetMouseButtonUp(0))
+        else if (Input.GetMouseButtonUp(0))
         {
             objToMove.GetComponent<Rigidbody>().useGravity = true;
             objToMove = null;

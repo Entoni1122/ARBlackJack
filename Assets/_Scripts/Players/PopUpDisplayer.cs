@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -9,7 +8,6 @@ public class PopUpDisplayer : MonoBehaviour
     [SerializeField] GameObject popUp;
     [SerializeField] TextMeshProUGUI popUpTXT;
     [SerializeField] float duration;
-
 
     public void ShowTEXT(string text)
     {

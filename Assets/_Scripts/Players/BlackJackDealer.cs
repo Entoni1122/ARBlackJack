@@ -4,21 +4,27 @@ using UnityEngine;
 
 public class BlackJackDealer : BlackJackBaseActors
 {
-    bool isDealerTurn;
-    bool isEndRound = false;
-
     [SerializeField] TextMeshProUGUI dealerNameTXT;
     [SerializeField] TextMeshProUGUI dealerScoreTXT;
 
-    public static Action<int> OnCalculatePoints;
+    bool isDealerTurn;
+    bool isEndRound;
 
-    private void OnEnable()
+    public static Action<int> OnCalculatePoints;
+    private void Awake()
     {
+        RestartGame();
+    }
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
         GameManagers.OnDealerFreeWillCallBack += DealerCanPLay;
     }
 
-    private void OnDisable()
+    protected override void OnDisable()
     {
+        base.OnDisable();
         GameManagers.OnDealerFreeWillCallBack -= DealerCanPLay;
     }
 
@@ -26,20 +32,23 @@ public class BlackJackDealer : BlackJackBaseActors
     {
         isEndRound = true;
     }
-
-    private void Start()
+    public override void RestartGame()
     {
-        dealerNameTXT.text = Names;
+        base.RestartGame();
         isDealerTurn = true;
+        dealerNameTXT.text = Names;
+        isEndRound = false;
+        dealerScoreTXT.text = points.ToString();
     }
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Interactable"))
         {
             Rigidbody rb = other.GetComponent<Rigidbody>();
+            CardValue cardValue = other.GetComponent<CardValue>();
             if (isEndRound)
             {
-                points += other.GetComponent<CardValue>().Points;
+                points += cardValue.Points;
                 dealerScoreTXT.text = points.ToString();
                 OnCalculatePoints?.Invoke(points);
                 return;
@@ -49,15 +58,17 @@ public class BlackJackDealer : BlackJackBaseActors
                 ThrowCard(rb);
                 return;
             }
-            points += other.GetComponent<CardValue>().Points;
+
+            points += cardValue.Points;
             cardsInHand++;
             dealerScoreTXT.text = points.ToString();
+
             if (cardsInHand == 2)
             {
-                print(cardsInHand);
                 OnPlayerReductionCallBack?.Invoke();
                 isDealerTurn = false;
             }
         }
     }
+
 }

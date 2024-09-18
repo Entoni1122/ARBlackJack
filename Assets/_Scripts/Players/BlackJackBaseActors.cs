@@ -6,15 +6,33 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider))]
 public class BlackJackBaseActors : MonoBehaviour
 {
+    [Header("Stats")]
     [SerializeField] protected int points;
-    public int Points { get { return points; }  }
+    [SerializeField] public string Names;
+    protected int cardsInHand;
+    public int Points { get { return points; } }
+
+    [Header("CardBoucines")]
     [SerializeField] float bounceForce = 5f;
     [SerializeField] float upwardVelocity = 40f;
     [SerializeField] Vector3 bounceDirection;
-    public static Action OnPlayerReductionCallBack;
-    protected int cardsInHand;
-    [SerializeField] public string Names;
 
+    public static Action OnPlayerReductionCallBack;
+
+    protected virtual void OnEnable()
+    {
+        UiManager.OnButtonRestartClickedCallBack += RestartGame;
+    }
+    protected virtual void OnDisable()
+    {
+        UiManager.OnButtonRestartClickedCallBack -= RestartGame;
+    }
+    public virtual void RestartGame()
+    {
+        print("BlackJackActor restarted");
+        points = 0;
+        cardsInHand = 0;
+    }
     protected virtual void ThrowCard(Rigidbody rb)
     {
         float randomX = UnityEngine.Random.Range(5, 30);

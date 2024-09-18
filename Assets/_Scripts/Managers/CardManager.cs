@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.Overlays;
 using UnityEngine;
 
 public class CardManager : MonoBehaviour
@@ -11,30 +11,24 @@ public class CardManager : MonoBehaviour
     [SerializeField] List<GameObject> outherCards;
     [SerializeField] float YOffSet;
 
+    public static Action<string> OnZeroRemainingCards;
+
+    private void Start()
+    {
+        RestartGame();
+    }
+
     private void OnEnable()
     {
-        TraceHandler.OnTakeFirstCardCallBack += SetLayerToCard;
+        TraceHandler.OnTakeFirstCardCallBack += OnRemoveTopCard;
         ButtonAnimation.OnShuffleButtonPressed += Shuffle;
+        UiManager.OnButtonRestartClickedCallBack += GetAllCardTogheter;
     }
     private void OnDisable()
     {
-        TraceHandler.OnTakeFirstCardCallBack -= SetLayerToCard;
+        TraceHandler.OnTakeFirstCardCallBack -= OnRemoveTopCard;
         ButtonAnimation.OnShuffleButtonPressed -= Shuffle;
-    }
-    private void Start()
-    {
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            inCards.Add(transform.GetChild(i).gameObject);
-        }
-        Shuffle();
-    }
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Shuffle();
-        }
+        UiManager.OnButtonRestartClickedCallBack -= GetAllCardTogheter;
     }
 
 #if UNITY_EDITOR
@@ -56,25 +50,35 @@ public class CardManager : MonoBehaviour
         }
     }
 #endif
-    public void SetLayerToCard(GameObject obj)
+    void RestartGame()
     {
-        if (inCards.Count <= 1)
+        for (int i = 0; i < transform.childCount; i++)
         {
-            return;
-
+            inCards.Add(transform.GetChild(i).gameObject);
         }
-
+        Shuffle();
+    }
+    public void OnRemoveTopCard(GameObject obj)
+    {
         if (!inCards.Contains(obj))
         {
             return;
         }
 
         outherCards.Add(inCards[0]);
-
-
         inCards.RemoveAt(0);
+
+        if (inCards.Count <= 0)
+        {
+            ShowOutOfBounds("Cards out of Bound");
+            return;
+        }
         inCards[0].layer = LayerMask.NameToLayer("Interactable");
         inCards[0].GetComponent<BoxCollider>().enabled = true;
+    }
+    public void ShowOutOfBounds(string text)
+    {
+        OnZeroRemainingCards?.Invoke(text);
     }
     public void Shuffle()
     {
@@ -83,7 +87,7 @@ public class CardManager : MonoBehaviour
 
         for (int i = 0; i < inCards.Count; i++)
         {
-            int randomIndex = Random.Range(i, inCards.Count);
+            int randomIndex = UnityEngine.Random.Range(i, inCards.Count);
 
             GameObject tempCard = inCards[i];
             inCards[i] = inCards[randomIndex];
@@ -96,6 +100,7 @@ public class CardManager : MonoBehaviour
         inCards[0].layer = LayerMask.NameToLayer("Interactable");
         inCards[0].GetComponent<BoxCollider>().enabled = true;
     }
+
     public void GetAllCardTogheter()
     {
         if (outherCards.Count > 0)
@@ -111,8 +116,11 @@ public class CardManager : MonoBehaviour
                 outherCards[i].transform.position = transform.position - new Vector3(0, inCards.Count * YOffSet, 0);
                 outherCards[i].transform.rotation = transform.rotation;
                 inCards.Add(outherCards[i]);
+                
             }
             outherCards.Clear();
+            inCards[0].GetComponent<BoxCollider>().enabled = true;
         }
     }
+
 }
