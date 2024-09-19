@@ -34,7 +34,7 @@ public class TraceHandler : MonoBehaviour
         if (Physics.Raycast(ray, out hitData, traceLenght))
         {
             IOnClick clickable = hitData.collider.gameObject.GetComponentInChildren<IOnClick>();
-            if (clickable != null && Input.GetMouseButton(0))
+            if (clickable != null && Input.GetMouseButtonDown(0))
             {
                 print("Overlapping with something clickable");
                 clickable.OnClick();

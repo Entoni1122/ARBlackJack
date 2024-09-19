@@ -56,6 +56,10 @@ public class TableManager : MonoBehaviour
                     maxTableValue = playerPoints;
                 }
             }
+            else
+            {
+                playerComponent.ForceState(State.Bust);
+            }
         }
         winners = new List<GameObject>(playerTracked);
         CalculateWinner(dealerPoints);
@@ -73,7 +77,8 @@ public class TableManager : MonoBehaviour
     public void PlayerReadyCount()
     {
         playerThatHit++;
-
+        print(playerThatHit);
+        //+1 because i count the dealer in the check
         if (playerThatHit >= playerDoneCount + 1)
         {
             foreach (GameObject player in playerInTheGame)
