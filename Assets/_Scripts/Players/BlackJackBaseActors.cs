@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider))]
-public class BlackJackBaseActors : MonoBehaviour
+public class BlackJackBaseActors : MonoBehaviour 
 {
     [Header("Stats")]
     [SerializeField] protected int points;

@@ -96,15 +96,14 @@ public class TableManager : MonoBehaviour
         winners.Clear();
         playerTracked.Clear();
     }
-    public void CalculateWinner(int points)
+    public void CalculateWinner(int dealerPoints)
     {
-        print("Delear points " + points);
         //If the dealer got more then 21 calculate the winner form the player that are in stand
         //Otherwise calculate each time the dealer picks a card, who need to go out
-        if (points > 21)
+        if (dealerPoints > 21)
         {
-            //If there is more then one winner append one to aother in the winner txt
-            if (winners.Count > 0)
+            //If there is more then one winner append one to another in the winner txt
+            if (winners.Count > 1)
             {
                 for (int i = 0; i < winners.Count; i++)
                 {
@@ -115,12 +114,12 @@ public class TableManager : MonoBehaviour
             }
             else
             {
-                //Otherwise just say that the dealer busted
                 ShowWinnerTEXT("Dealer Busted");
+                winners[0].GetComponentInChildren<BlackJackPlayer>().ForceState(State.Win);
             }
             return;
         }
-        if (points > maxTableValue)
+        if (dealerPoints > maxTableValue)
         {
             //If the dealer point are more than the table point but less then 21 it means that the dealer wind vs all
             //Then change state of the player to display something
@@ -131,7 +130,7 @@ public class TableManager : MonoBehaviour
             }
             return;
         }
-        if (points == maxTableValue)
+        if (dealerPoints == maxTableValue)
         {
             ShowWinnerTEXT("TIE");
             for (int i = 0; i < winners.Count; i++)
@@ -144,13 +143,14 @@ public class TableManager : MonoBehaviour
         {
             BlackJackPlayer playerComponent = winners[i].GetComponentInChildren<BlackJackPlayer>();
             int playerPoints = playerComponent.Points;
-            if (playerPoints < points)
+            if (playerPoints < dealerPoints)
             {
                 playerComponent.ForceState(State.Bust);
                 winners.Remove(winners[i].gameObject);
                 //Check if the last player was removed so that the dealer wins without doing another time the method
                 if (winners.Count <= 0)
                 {
+                    playerComponent.ForceState(State.Bust);
                     ShowWinnerTEXT("Dealer Won");
                 }
             }

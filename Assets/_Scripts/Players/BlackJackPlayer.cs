@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 public enum State { Hit, Stand, Bust, Win, Tie, Think, Decision }
-public class BlackJackPlayer : BlackJackBaseActors
+public class BlackJackPlayer : BlackJackBaseActors, IOnClick
 {
     public State CurrentState { get { return currentState; } }
 
@@ -13,6 +13,7 @@ public class BlackJackPlayer : BlackJackBaseActors
     [SerializeField] PopUpDisplayer popUpDiplayer;
 
     public static Action OnPlayerTurnEndCallBack;
+    public static Action<string, int, string> OnPlayerClickedCallBack;
 
     private void Start()
     {
@@ -30,7 +31,7 @@ public class BlackJackPlayer : BlackJackBaseActors
     {
         //Each time you change state the animator sees the enum State and uses the correct number to switch
         animator.SetTrigger("ChangeState");
-        animator.SetInteger("State",(int)currentState);
+        animator.SetInteger("State", (int)currentState);
         switch (currentState)
         {
             case State.Hit:
@@ -43,6 +44,14 @@ public class BlackJackPlayer : BlackJackBaseActors
                 popUpDiplayer.ShowTEXT(stateTXT);
                 OnPlayerReductionCallBack?.Invoke();
                 OnPlayerTurnEndCallBack?.Invoke();
+                break;
+            case State.Win:
+                stateTXT = "WON";
+                popUpDiplayer.ShowTEXT(stateTXT);
+                break;
+            case State.Tie:
+                stateTXT = "TIE";
+                popUpDiplayer.ShowTEXT(stateTXT);
                 break;
             case State.Think:
                 OnPlayerReductionCallBack?.Invoke();
@@ -131,5 +140,20 @@ public class BlackJackPlayer : BlackJackBaseActors
                 ChangeState(State.Decision);
             }
         }
+    }
+
+    public void OnClick()
+    {
+        OnPlayerClickedCallBack?.Invoke(Names, points, stateTXT);
+    }
+
+    public void OnClick(GameObject obj)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnClick(string name, int score)
+    {
+        throw new NotImplementedException();
     }
 }

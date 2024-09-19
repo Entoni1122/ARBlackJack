@@ -13,10 +13,6 @@ public class TraceHandler : MonoBehaviour
     [SerializeField] float rotSpeed;
     [SerializeField] float yOffSet;
 
-    [Header("PlayerStatTXT")]
-    [SerializeField] GameObject playerStat;
-    [SerializeField] TextMeshProUGUI playerNameTXT;
-    [SerializeField] TextMeshProUGUI scoreTXT;
     GameObject objToMove;
     bool shouldTrace = true;
 
@@ -37,13 +33,11 @@ public class TraceHandler : MonoBehaviour
 
         if (Physics.Raycast(ray, out hitData, traceLenght))
         {
-            if (hitData.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+            IOnClick clickable = hitData.collider.gameObject.GetComponentInChildren<IOnClick>();
+            if (clickable != null && Input.GetMouseButton(0))
             {
-                print("Overlappong with a player");
-                playerStat.SetActive(true);
-                playerNameTXT.text = hitData.collider.GetComponentInChildren<BlackJackPlayer>().Names;
-                scoreTXT.text = hitData.collider.GetComponentInChildren<BlackJackPlayer>().Points.ToString();
-                
+                print("Overlapping with something clickable");
+                clickable.OnClick();
             }
             else if (hitData.collider.gameObject.layer == LayerMask.NameToLayer("Interactable")
                                                           && Input.GetMouseButtonDown(0))
@@ -56,12 +50,12 @@ public class TraceHandler : MonoBehaviour
             }
             else
             {
-                playerStat.SetActive(false);
+                //Stats disale
             }
         }
         else
         {
-            playerStat.SetActive(false);
+            //Stats disale
         }
 
         if (!objToMove)
