@@ -61,4 +61,14 @@ public class UiManager : MonoBehaviour
         restartBTN.gameObject.SetActive(false);
         winnerTextContainer.gameObject.SetActive(false);
     }
+    bool isPaused;
+    public void PauseGame()
+    {
+        Time.timeScale = isPaused ? 1 : 0;
+        isPaused = !isPaused;
+    }
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 }

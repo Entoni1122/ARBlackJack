@@ -1,5 +1,3 @@
-using UnityEditor.PackageManager.UI;
-using UnityEditor.Rendering;
 using UnityEngine;
 
 public class HeadSimulation : MonoBehaviour
