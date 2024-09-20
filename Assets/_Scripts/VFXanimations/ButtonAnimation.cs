@@ -10,7 +10,9 @@ public class ButtonAnimation : MonoBehaviour, IOnClick
     [SerializeField] float returnDuration = 0.1f;
     
     [Header("AudioCLip")]
-    [SerializeField] AudioClip clip;
+    [SerializeField] AudioClip clipPressedButton;
+    [SerializeField] AudioClip clipShufflingCard;
+    [SerializeField] Transform shufflePos;
 
     private Vector3 originalScale;
     private bool isPressed = false;
@@ -54,7 +56,8 @@ public class ButtonAnimation : MonoBehaviour, IOnClick
         if (!isPressed)
         {
             StartCoroutine(PressButton());
-            AudioSource.PlayClipAtPoint(clip, transform.position);
+            AudioSource.PlayClipAtPoint(clipPressedButton, transform.position);
+            AudioSource.PlayClipAtPoint(clipShufflingCard, shufflePos.position);
         }
     }
 

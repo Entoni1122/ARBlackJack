@@ -477,6 +477,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   stateTXT: 
   popUpDiplayer: {fileID: 5023415515405909313}
+  clip: {fileID: 8300000, guid: 194e0cc6e5c95fe4aa37821125f8b453, type: 3}
 --- !u!114 &5023415515405909313
 MonoBehaviour:
   m_ObjectHideFlags: 0

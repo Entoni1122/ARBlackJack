@@ -15,6 +15,8 @@ public class BlackJackPlayer : BlackJackBaseActors, IOnClick
     public static Action OnPlayerTurnEndCallBack;
     public static Action<string, int, string> OnPlayerClickedCallBack;
 
+    [SerializeField] AudioClip clip;
+
     private void Start()
     {
         animator = GetComponentInChildren<Animator>();
@@ -122,7 +124,7 @@ public class BlackJackPlayer : BlackJackBaseActors, IOnClick
                 ThrowCard(rb);
                 return;
             }
-
+            AudioSource.PlayClipAtPoint(clip,transform.position);
             points += other.GetComponent<CardValue>().Points;
             other.gameObject.layer = 0;
             cardsInHand++;
