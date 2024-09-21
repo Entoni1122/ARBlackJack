@@ -77,7 +77,6 @@ public class TableManager : MonoBehaviour
     public void PlayerReadyCount()
     {
         playerThatHit++;
-        print(playerThatHit);
         //+1 because i count the dealer in the check
         if (playerThatHit >= playerDoneCount + 1)
         {
@@ -85,8 +84,9 @@ public class TableManager : MonoBehaviour
             {
                 player.GetComponentInChildren<BlackJackPlayer>().ChangeState(State.Decision);
             }
-            playerThatHit = 0;
+            playerThatHit = 1;
         }
+        print("Player done are : " + playerDoneCount);
     }
     public void ShowWinnerTEXT(string winner)
     {
@@ -101,7 +101,7 @@ public class TableManager : MonoBehaviour
         winners.Clear();
         playerTracked.Clear();
     }
-    public void CalculateWinner(int dealerPoints)
+    private void CalculateWinner(int dealerPoints)
     {
         //If the dealer got more then 21 calculate the winner form the player that are in stand
         //Otherwise calculate each time the dealer picks a card, who need to go out
@@ -129,25 +129,31 @@ public class TableManager : MonoBehaviour
             //If the dealer point are more than the table point but less then 21 it means that the dealer wind vs all
             //Then change state of the player to display something
             ShowWinnerTEXT("Dealer Won");
-            for (int i = 0; i < winners.Count; i++)
-            {
-                winners[i].GetComponentInChildren<BlackJackPlayer>().ForceState(State.Bust);
-            }
+            InitiateStateToWinnerList(State.Bust);
             return;
         }
+        //Checks the remaining player to bust who is under the dealer
+        UpdateWinnerList(dealerPoints);
         if (dealerPoints == maxTableValue)
         {
             ShowWinnerTEXT("TIE");
-            for (int i = 0; i < winners.Count; i++)
-            {
-                winners[i].GetComponentInChildren<BlackJackPlayer>().ForceState(State.Tie);
-            }
+            //All remaining player with the same value go in tie
+            InitiateStateToWinnerList(State.Tie);
         }
-        //Checks the remaining player to bust who is under the dealer
+    }
+
+    private void UpdateWinnerList(int dealerPoints)
+    {
         for (int i = 0; i < winners.Count; i++)
         {
             BlackJackPlayer playerComponent = winners[i].GetComponentInChildren<BlackJackPlayer>();
             int playerPoints = playerComponent.Points;
+            if (playerPoints == dealerPoints)
+            {
+                //The single player that goes tie while the game is running get removed
+                playerComponent.ForceState(State.Tie);
+                winners.Remove(winners[i].gameObject);
+            }
             if (playerPoints < dealerPoints)
             {
                 playerComponent.ForceState(State.Bust);
@@ -159,6 +165,13 @@ public class TableManager : MonoBehaviour
                     ShowWinnerTEXT("Dealer Won");
                 }
             }
+        }
+    }
+    private void InitiateStateToWinnerList(State state)
+    {
+        for (int i = 0; i < winners.Count; i++)
+        {
+            winners[i].GetComponentInChildren<BlackJackPlayer>().ForceState(state);
         }
     }
 }

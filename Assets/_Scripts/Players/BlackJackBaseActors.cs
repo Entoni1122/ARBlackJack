@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider))]
-public class BlackJackBaseActors : MonoBehaviour 
+public class BlackJackBaseActors : MonoBehaviour
 {
     [Header("Stats")]
     [SerializeField] protected int points;
@@ -31,6 +31,7 @@ public class BlackJackBaseActors : MonoBehaviour
         points = 0;
         cardsInHand = 0;
     }
+    
     protected virtual void ThrowCard(Rigidbody rb)
     {
         float randomX = UnityEngine.Random.Range(5, 30);
@@ -42,5 +43,9 @@ public class BlackJackBaseActors : MonoBehaviour
 
         Debug.DrawRay(rb.transform.position, force, Color.red, 2.0f);
 
+    }
+    protected virtual void OnTriggerEnter(Collider other)
+    {
+        other.gameObject.layer = 0;
     }
 }

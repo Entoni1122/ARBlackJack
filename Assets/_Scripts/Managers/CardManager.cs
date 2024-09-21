@@ -55,6 +55,7 @@ public class CardManager : MonoBehaviour
         for (int i = 0; i < transform.childCount; i++)
         {
             inCards.Add(transform.GetChild(i).gameObject);
+            inCards[i].gameObject.layer = LayerMask.NameToLayer("Interactable");
         }
         Shuffle();
     }
@@ -120,6 +121,7 @@ public class CardManager : MonoBehaviour
             }
             outherCards.Clear();
             inCards[0].GetComponent<BoxCollider>().enabled = true;
+            inCards[0].gameObject.layer = LayerMask.NameToLayer("Interactable");
         }
     }
 

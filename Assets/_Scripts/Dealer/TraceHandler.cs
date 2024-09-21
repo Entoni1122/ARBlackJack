@@ -62,7 +62,7 @@ public class TraceHandler : MonoBehaviour
             return;
         }
 
-        if (Input.GetMouseButton(0))
+        if (hitData.collider && Input.GetMouseButton(0) && hitData.collider.gameObject != objToMove)
         {
             Vector3 targetPos = ray.GetPoint(hitData.distance) + new Vector3(0, yOffSet, 0);
             objToMove.transform.position = Vector3.Lerp(objToMove.transform.position,

@@ -38,21 +38,21 @@ public class BlackJackPlayer : BlackJackBaseActors, IOnClick
         {
             case State.Hit:
                 //pop up they want to hit
-                stateTXT = "HIT";
+                stateTXT = "Hit";
                 popUpDiplayer.ShowTEXT(stateTXT);
                 break;
             case State.Stand:
-                stateTXT = "STAND";
+                stateTXT = "Stand";
                 popUpDiplayer.ShowTEXT(stateTXT);
                 OnPlayerReductionCallBack?.Invoke();
                 OnPlayerTurnEndCallBack?.Invoke();
                 break;
             case State.Win:
-                stateTXT = "WON";
+                stateTXT = "Win";
                 popUpDiplayer.ShowTEXT(stateTXT);
                 break;
             case State.Tie:
-                stateTXT = "TIE";
+                stateTXT = "Tie";
                 popUpDiplayer.ShowTEXT(stateTXT);
                 break;
             case State.Think:
@@ -69,7 +69,7 @@ public class BlackJackPlayer : BlackJackBaseActors, IOnClick
                 }
                 break;
             case State.Bust:
-                stateTXT = "BUST";
+                stateTXT = "Bust";
                 popUpDiplayer.ShowTEXT(stateTXT);
                 OnPlayerReductionCallBack?.Invoke();
                 OnPlayerTurnEndCallBack?.Invoke();
@@ -84,6 +84,7 @@ public class BlackJackPlayer : BlackJackBaseActors, IOnClick
         //May the power be with you
         animator.SetTrigger("ChangeState");
         animator.SetInteger("State", (int)state);
+        stateTXT = state.ToString();
     }
     public void ChangeState(State states)
     {
@@ -110,38 +111,38 @@ public class BlackJackPlayer : BlackJackBaseActors, IOnClick
 
         return randomCheck <= percentage;
     }
-    private void OnTriggerEnter(Collider other)
+    protected override void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer("Interactable"))
+        base.OnTriggerEnter(other);
+        Rigidbody rb = other.GetComponent<Rigidbody>();
+        if (rb == null || !rb.useGravity)
         {
-            Rigidbody rb = other.GetComponent<Rigidbody>();
-            if (rb == null || !rb.useGravity)
-            {
-                return;
-            }
-            if (currentState != State.Hit)
-            {
-                ThrowCard(rb);
-                return;
-            }
-            AudioSource.PlayClipAtPoint(clip,transform.position);
-            points += other.GetComponent<CardValue>().Points;
-            other.gameObject.layer = 0;
-            cardsInHand++;
-
-            if (points > 21)
-            {
-                ChangeState(State.Bust);
-            }
-            else if (cardsInHand == 2)
-            {
-                ChangeState(State.Think);
-            }
-            else if (points < 21 && cardsInHand > 2)
-            {
-                ChangeState(State.Decision);
-            }
+            return;
         }
+        if (currentState != State.Hit)
+        {
+            ThrowCard(rb);
+            return;
+        }
+        AudioSource.PlayClipAtPoint(clip, transform.position);
+        points += other.GetComponent<CardValue>().Points;
+        other.gameObject.layer = 0;
+        cardsInHand++;
+
+        if (points > 21)
+        {
+            ChangeState(State.Bust);
+        }
+        else if (cardsInHand == 2)
+        {
+            ChangeState(State.Think);
+        }
+
+        else if (points < 21 && cardsInHand > 2)
+        {
+            ChangeState(State.Think);
+        }
+
     }
 
     public void OnClick()

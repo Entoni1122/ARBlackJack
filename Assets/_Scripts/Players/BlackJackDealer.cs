@@ -40,34 +40,32 @@ public class BlackJackDealer : BlackJackBaseActors
         isEndRound = false;
         dealerScoreTXT.text = points.ToString();
     }
-    private void OnTriggerEnter(Collider other)
+    protected override void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer("Interactable"))
+        base.OnTriggerEnter(other);
+        Rigidbody rb = other.GetComponent<Rigidbody>();
+        CardValue cardValue = other.GetComponent<CardValue>();
+        if (isEndRound)
         {
-            Rigidbody rb = other.GetComponent<Rigidbody>();
-            CardValue cardValue = other.GetComponent<CardValue>();
-            if (isEndRound)
-            {
-                points += cardValue.Points;
-                dealerScoreTXT.text = points.ToString();
-                OnCalculatePoints?.Invoke(points);
-                return;
-            }
-            if (!isDealerTurn)
-            {
-                ThrowCard(rb);
-                return;
-            }
-
             points += cardValue.Points;
-            cardsInHand++;
             dealerScoreTXT.text = points.ToString();
+            OnCalculatePoints?.Invoke(points);
+            return;
+        }
+        if (!isDealerTurn)
+        {
+            ThrowCard(rb);
+            return;
+        }
 
-            if (cardsInHand == 2)
-            {
-                OnPlayerReductionCallBack?.Invoke();
-                isDealerTurn = false;
-            }
+        points += cardValue.Points;
+        cardsInHand++;
+        dealerScoreTXT.text = points.ToString();
+
+        if (cardsInHand == 2)
+        {
+            OnPlayerReductionCallBack?.Invoke();
+            isDealerTurn = false;
         }
     }
 
