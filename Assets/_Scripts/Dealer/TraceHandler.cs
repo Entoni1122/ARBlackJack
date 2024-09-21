@@ -16,6 +16,7 @@ public class TraceHandler : MonoBehaviour
     bool shouldTrace = true;
 
     public static Action<GameObject> OnTakeFirstCardCallBack;
+    public static Action OnDisableStatsCallBack;
 
     private void Update()
     {
@@ -47,14 +48,6 @@ public class TraceHandler : MonoBehaviour
 
                 OnTakeFirstCardCallBack?.Invoke(objToMove);
             }
-            else
-            {
-                //Stats disale
-            }
-        }
-        else
-        {
-            //Stats disale
         }
 
         if (!objToMove)
